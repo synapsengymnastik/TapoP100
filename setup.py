@@ -7,18 +7,18 @@ with open('HISTORY.md') as history_file:
     HISTORY = history_file.read()
 
 setup_args = dict(
-    name='PyP100',
-    version='0.0.17',
-    description='A module for controlling the Tp-link Tapo P100/P105/P110 plugs and L530/L510E bulbs.',
+    name='Tapo',
+    version='0.0.1',
+    description='A module for controlling the Tp-link Tapo P100/P110 plugs',
     long_description_content_type="text/markdown",
     long_description=README,
     license='MIT',
     packages=find_packages(),
-    author='Toby Johnson',
-    author_email='toby.e.m.Johnson@gmail.com',
+    author='synapsengymnastik',
+    author_email='synapsengymnastik@gmail.com',
     keywords=['Tapo', 'Tp-Link', 'P100'],
-    url='https://github.com/fishbigger/TapoP100',
-    download_url='https://pypi.org/project/PyP100/'
+    url='https://github.com/synapsengymnastik/Tapo',
+    download_url='https://github.com/synapsengymnastik/Tapo'
 )
 
 install_requires = [
