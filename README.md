@@ -1,5 +1,5 @@
 # Tapo P100
-Tapo P100 is a Python library for controlling the Tp-link Tapo P100/P105/P110 plugs and L530/L510E bulbs.
+Tapo P100 is a Python library for controlling the Tp-link Tapo P100/P110 plugs.
 
 ## Installation
 
@@ -10,58 +10,123 @@ pip3 install PyP100
 ```
 
 ## Usage
-Plugs - P100, P105 etc.
-```python
-from PyP100 import PyP100
-
-p100 = PyP100.P100("192.168.X.X", "email@gmail.com", "Password123") #Creating a P100 plug object
-
-p100.handshake() #Creates the cookies required for further methods
-p100.login() #Sends credentials to the plug and creates AES Key and IV for further methods
-
-p100.turnOn() #Sends the turn on request
-p100.turnOff() #Sends the turn off request
-p100.getDeviceInfo() #Returns dict with all the device info
+Plugs - P100 & P110 
 ```
-Bulbs - L510E, L530 etc.
-```python
-from PyP100 import PyL530
+from . import Tapo
 
-l530 = PyL530.L530("192.168.X.X", "email@gmail.com", "Password123") #Creating a L530 bulb object
+p = Tapo("192.168.X.X", "email@gmail.com", "Password123") #Creating a P100 plug object
 
-l530.handshake() #Creates the cookies required for further methods
-l530.login() #Sends credentials to the plug and creates AES Key and IV for further methods
+p.handshake() #Creates the cookies required for further methods
 
-#All the bulbs have the PyP100 functions and additionally allows for setting brightness, colour and white temperature
-l530.setBrightness(100) #Sends the set brightness request
-l530.setColorTemp(2700) #Sets the colour temperature to 2700 Kelvin (Warm White)
-l530.setColor(100, 100) #Sends the set colour request
-```
+p.login() #Sends credentials to the plug and creates AES Key and IV for further methods
 
-Energy Monitoring - P110
-```python
-from PyP100 import PyP110
 
-p110 = PyP110.P110("192.168.X.X", "email@gmail.com", "Password123") #Creating a P110 plug object
+p.turnOn() #Sends the turn on request
 
-p110.handshake() #Creates the cookies required for further methods
-p110.login() #Sends credentials to the plug and creates AES Key and IV for further methods
+p.turnOff() #Sends the turn off request
 
-#PyP110 has all PyP100 functions and additionally allows to query energy usage infos
-p110.getEnergyUsage() #Returns dict with all the energy usage
-```
+p.turnOnWithDelay(10) # Sends the turn on request with 10 seconds delay
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+p.turnOffWithDelay(10) # Sends the turn off request with 10 seconds delay
 
-## Contributers
-[K4CZP3R](https://github.com/K4CZP3R)\
-[Sonic74](https://github.com/sonic74)\
-[shadow00](https://github.com/shadow00)\
-[mochipon](https://github.com/mochipon)\
-[realzoulou](https://github.com/realzoulou)\
-[arrival-spring](https://github.com/arrival-spring)\
-[wlp7s0](https://github.com/wlp7s0)
 
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
+p.toggle("on", 0) # Sends the turn on request
+
+p.toggle("off", 0) # Sends the turn off request
+
+p.toggle("on", 10) # Sends the turn on request with 10 seconds delay
+
+p.toggle("off", 10) # Sends the turn off request with 10 seconds delay
+
+
+p.getDeviceInfo() # Returns dict with all the device info
+you can use this commands:
+decryptedResponse,
+'result': decryptedResponse["result"],
+'device_id': decryptedResponse["result"]["device_id"],
+'fw_ver': decryptedResponse["result"]["fw_ver"],
+'model': decryptedResponse["result"]["model"],
+'mac': decryptedResponse["result"]["mac"],
+'overheated': decryptedResponse["result"]["overheated"],
+'ip': decryptedResponse["result"]["ip"],
+'time_diff': decryptedResponse["result"]["time_diff"],
+'ssid': decryptedResponse["result"]["ssid"],
+'signal_level': decryptedResponse["result"]["signal_level"],
+'nickname': decryptedResponse["result"]["nickname"],
+'device_on': decryptedResponse["result"]["device_on"],
+'on_time': decryptedResponse["result"]["on_time"],
+'error_code': decryptedResponse["error_code"]
+          
+
+p.getEnergyUsage("result") # Returns dict with all the energy usage
+you can use this commands:
+'response': decryptedResponse,
+'result': decryptedResponse["result"],
+'today_runtime': decryptedResponse["result"]["today_runtime"],
+'month_runtime': decryptedResponse["result"]["month_runtime"],
+'today_energy': decryptedResponse["result"]["today_energy"],
+'month_energy': decryptedResponse["result"]["month_energy"],
+'local_time': decryptedResponse["result"]["local_time"],
+'past24h': decryptedResponse["result"]["past24h"],
+'past30d': decryptedResponse["result"]["past30d"],
+'past1y': decryptedResponse["result"]["past1y"],
+'past7d': decryptedResponse["result"]["past7d"],
+'current_power': decryptedResponse["result"]["current_power"],
+'error_code': decryptedResponse["error_code"]
+          
+
+p.getLEDInfo("response") # Infos for the LED
+you can use this commands:
+'response': decryptedResponse,
+'result': decryptedResponse["result"],
+'night_mode_type': decryptedResponse["result"]["night_mode"]["night_mode_type"],
+'start_time': decryptedResponse["result"]["night_mode"]["start_time"],
+'end_time': decryptedResponse["result"]["night_mode"]["end_time"],		
+'sunrise_offset': decryptedResponse["result"]["night_mode"]["sunrise_offset"],
+'sunset_offset': decryptedResponse["result"]["night_mode"]["sunset_offset"],
+'led_status': decryptedResponse["result"]["led_status"],
+'led_rule': decryptedResponse["result"]["led_rule"],
+'error_code': decryptedResponse["error_code"],
+
+
+p.toggleLED("on") # turns the LED On - the LED is On if the Relay is On and Off if the Relay is Off
+
+p.toggleLED("off") # turns the LED Off - the LED is alwys Off
+
+
+p.setNickname(Name) # sets a new name for the device
+
+
+p.IPCheck() # Is checking, if the IP is valide.
+
+p.ConnectionRoutine() # Is a function that combines IPCheck, Handshake and Login.
+
+
+p.ErrorCeck() # All functions are returning a ErrorCode or a Value (get functions). 
+              # The ErrorCheck function is searching for a ErrorMessage for the Errornumber.
+              
+p.sendGet("get_device_running_info") # sen different get commands              
+# generally function for using different "get" functions, like:
+# get_device_running_info
+# get_device_usage
+# get_wireless_scan_info
+# qs_component_nego
+# component_nego
+# get_device_time
+# get_countdown_rules
+# get_antitheft_rules
+# get_inherit_info
+# get_ffs_info
+# get_connect_cloud_state
+# getWifiBasic       
+              
+
+
+Example for using the ConnectionRoutine and a function with ErrorCheck:
+
+p = Tapo("192.168.1.99", "magictrips@hotmail.com", "1234octo&&&")
+
+Chk =p.ConnectionRoutine()
+print("ConnectionRoutin: ", p.ErrorCheck(Chk))
+if Chk["error_code"] == 0:
+	print(p.sendGet("getDeviceList"))
