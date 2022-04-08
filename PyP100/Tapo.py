@@ -281,15 +281,11 @@ class Tapo():
 					'error_code': decryptedResponse["error_code"]
 					}
 		
-		if command == "nickname":
-			encodedName = decryptedResponse["result"]["nickname"]
-			name = b64decode(encodedName)
-			return name.decode("utf-8")
-		elif command == "ssid":
+		if command == "ssid":
 			encodedSSID = decryptedResponse["result"]["ssid"]
 			SSID = b64decode(encodedSSID)
 			return SSID.decode("utf-8")
-		elif command != "nickname" and command != "ssid":
+		elif command != "ssid":
 			return commands[command]
 
 
