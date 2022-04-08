@@ -1,3 +1,6 @@
+#If you like my work, you can please buy me a coffee:
+https://www.paypal.me/synapsengymnastik
+
 # Tapo P100
 Tapo P100 is a Python library for controlling the Tp-link Tapo P100/P110 plugs.
 
