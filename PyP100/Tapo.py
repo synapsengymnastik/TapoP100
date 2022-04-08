@@ -1,26 +1,22 @@
-
-
-import requests
-from requests import Session
-
-from base64 import b64encode, b64decode
-import hashlib
-from Crypto.PublicKey import RSA
-import time
-import json
-from Crypto.Cipher import AES, PKCS1_OAEP, PKCS1_v1_5
+# last changeing on 08.04.2022
+# Version 1.0.1
 
 import ast
-import pkgutil
-import uuid
-
+import base64
+import hashlib
+import json
 import logging
+import pkgutil
+import socket
+import time
+import uuid
+from base64 import b64decode, b64encode
 
 import pkcs7
-import base64
-
-import socket
-
+import requests
+from Crypto.Cipher import AES, PKCS1_OAEP, PKCS1_v1_5
+from Crypto.PublicKey import RSA
+from requests import Session
 
 
 class Tapo():
@@ -361,9 +357,8 @@ class Tapo():
 
 		decryptedResponse = self.decrypt(r.json()["result"]["response"])
   
-    
-# Toggle On or Off with or without delay
-	def toggle(self, command, delay=0):
+# overwrite Countdownrules
+	def overwriteCountdown(self, command):
 		URL = f"http://{self.ipAddress}/app?token={self.token}"
   
 		headers = {"Cookie": self.cookie}
@@ -377,6 +372,53 @@ class Tapo():
   
 		#overwrite countdownrule
 		Payload = {"method": "add_countdown_rule", "params": {"delay": 0, "desired_states": {"on": state}, "enable": False,	"remain": 0},"terminalUUID": self.terminalUUID}
+  
+		EncryptedPayload = self.encrypt(json.dumps(Payload))
+
+		SecurePassthroughPayload = {"method": "securePassthrough","params": {"request": EncryptedPayload}}
+
+		r = self.session.post(URL, json=SecurePassthroughPayload, headers=headers)
+		# r = <Response [200]> 
+
+		# r.json(): {'error_code': 0, 'result': {'response': 'ENCRYPTED'}}
+		decryptedResponse = self.decrypt(r.json()["result"]["response"])
+		# decryptedResponse: {"result":{"id":"C1"},"error_code":0}
+  
+		errorCode = ast.literal_eval(decryptedResponse)["error_code"]
+  
+		return json.loads(decryptedResponse)   
+    
+# Toggle On or Off with or without delay
+	def toggle(self, command, delay=0):
+		URL = f"http://{self.ipAddress}/app?token={self.token}"
+  
+		headers = {"Cookie": self.cookie}
+  
+		if command == "on":
+				state = True
+		elif command == "off":
+				state = False
+		elif command != "on" & command != "off":
+			return {'error_code': 5}
+
+		#overwrite On countdownrule
+		Payload = {"method": "add_countdown_rule", "params": {"delay": 0, "desired_states": {"on": True}, "enable": False,	"remain": 0},"terminalUUID": self.terminalUUID}
+  
+		EncryptedPayload = self.encrypt(json.dumps(Payload))
+
+		SecurePassthroughPayload = {"method": "securePassthrough","params": {"request": EncryptedPayload}}
+
+		r = self.session.post(URL, json=SecurePassthroughPayload, headers=headers)
+		# r = <Response [200]> 
+
+		# r.json(): {'error_code': 0, 'result': {'response': 'ENCRYPTED'}}
+		decryptedResponse = self.decrypt(r.json()["result"]["response"])
+		# decryptedResponse: {"result":{"id":"C1"},"error_code":0}
+  
+		errorCode = ast.literal_eval(decryptedResponse)["error_code"]
+    
+		#overwrite Off countdownrule
+		Payload = {"method": "add_countdown_rule", "params": {"delay": 0, "desired_states": {"on": False}, "enable": False,	"remain": 0},"terminalUUID": self.terminalUUID}
   
 		EncryptedPayload = self.encrypt(json.dumps(Payload))
 
@@ -442,6 +484,7 @@ class Tapo():
                		'error_code': decryptedResponse["error_code"],
 					}
 		return commands[command]
+
 
 	def toggleLED(self, command):
 		URL = f"http://{self.ipAddress}/app?token={self.token}"
